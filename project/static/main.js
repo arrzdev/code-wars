@@ -1,7 +1,7 @@
-const URL = "http://localhost:5000"
+const URL = location.href
 
 const generate = async (url) => {
-  let base_url = `${URL}/generate`;
+  let base_url = `${URL}generate`;
 
   const headers = new Headers({
     "Content-Type": "application/json"
@@ -17,7 +17,7 @@ const generate = async (url) => {
 
   data = await res.json()
   
-  document.querySelector("#url-placeholder").textContent = `http://localhost:5000/r/${data.token}`
+  document.querySelector("#url-placeholder").textContent = `${URL}r/${data.token}`
 }
 
 document.querySelector("#form").addEventListener("submit", (event) => {

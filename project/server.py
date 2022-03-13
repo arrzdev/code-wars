@@ -109,7 +109,7 @@ def search():
     else:
       statistics_collections.insert_one({
         "query": query,
-        "hits": 0
+        "hits": 1
       })
 
     #get every thing
