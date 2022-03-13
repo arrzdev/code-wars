@@ -1,0 +1,32 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>URL Shortener</title>
+    <meta name="description" content="Shortit is a url shortener">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">         
+</head>
+
+<body>
+    <header>
+        <div id="logo"><a class="logo">Short URL</a></div>
+    </header>
+    <main>
+        <section id="urlbox">
+            <h1>Paste the URL to be shortened</h1>
+            <form id="form" method="post">
+                <div id="formurl">
+                    <input type="text" name="url" placeholder="Enter the link here">
+                    <div id="formbutton">
+                        <input type="submit" value="Shorten URL">
+                    </div>
+                </div>
+            </form>
+            <p id="url-placeholder" class="boxtextcenter"></p>
+        </section>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script src="{{ url_for('static', filename='main.js') }}"></script>
+</html>
