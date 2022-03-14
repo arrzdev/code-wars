@@ -6,6 +6,13 @@ from modules.mongo import *
 from flask import Flask, render_template, request, redirect
 from os import system
 
+#connect to database
+db = connect()
+
+#get collections
+tokens_collection = db.tokens
+statistics_collection = db.statistics
+
 app = Flask(__name__)
 
 @app.route('/')
@@ -21,7 +28,7 @@ def generate():
     token = generate_token()
 
     #store it
-    tokens_collections.insert_one({
+    tokens_collection.insert_one({
       "url": url,
       "token": token,
       "hits": 0,
@@ -38,7 +45,7 @@ def get_from_token():
     token = request.json["token"]
 
     #search it up on mongodb
-    tokens_cursor = tokens_collections.find({
+    tokens_cursor = tokens_collection.find({
       "token": token
     })
     
@@ -53,11 +60,15 @@ def get_from_token():
     else:
       data = entries[0]
       
+      url = data["url"]
+      n_hits = data["hits"]
+
+
       return {
         "status": "ok",
-        "url": data["url"],
+        "url": url,
         "token": token,
-        "hits": data["hits"]
+        "hits": n_hits
       }, 200
 
 '''
@@ -66,7 +77,7 @@ def get_from_url():
   if request.method == "POST":
     url = request.json["url"]
 
-    pointer = tokens_collections.find({
+    pointer = tokens_collection.find({
       "url": url
     })
 
@@ -86,7 +97,7 @@ def search():
     query = request.json["query"]
 
     #check if that query was already searched
-    statistics_cursor = statistics_collections.find({
+    statistics_cursor = statistics_collection.find({
       "query": query
     })
 
@@ -97,7 +108,7 @@ def search():
       data = statistics_entries[0]
       n_hits = data["hits"]
 
-      statistics_collections.update_one(
+      statistics_collection.update_one(
         {"_id": data["_id"]},
         {"$set":
           {
@@ -107,13 +118,13 @@ def search():
       )
     
     else:
-      statistics_collections.insert_one({
+      statistics_collection.insert_one({
         "query": query,
         "hits": 1
       })
 
     #get every thing
-    tokens_cursor = tokens_collections.find()
+    tokens_cursor = tokens_collection.find()
 
     found_entries = []
     for entry in tokens_cursor:
@@ -133,19 +144,21 @@ def search():
 #Main endpoint
 @app.route('/r/<token>')
 def redirect_page(token):
-  tokens_cursor = tokens_collections.find({
+  tokens_cursor = tokens_collection.find({
     "token": token
   })
 
   tokens_entries = list(tokens_cursor)
 
   data = tokens_entries[0]
+
+  _id = data["_id"]
   url = data["url"]
   n_hits = data["hits"]
 
   #register hit
-  tokens_collections.update_one(
-    {"_id": data["_id"]},
+  tokens_collection.update_one(
+    {"_id": _id},
     {"$set":
         {
           "hits": n_hits + 1,
@@ -153,14 +166,14 @@ def redirect_page(token):
     }
   )
 
-  return redirect(url, code=301)
+  return redirect(url, code=302)
 
 
 def generate_token():
   token = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k = 8))
 
   #create a unique token that isn't in the db yet
-  tokens_cursor = tokens_collections.find({
+  tokens_cursor = tokens_collection.find({
     "token": token
   })
 
@@ -172,7 +185,7 @@ def generate_token():
     #generate a new token
     token = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k = 8))
 
-    tokens_cursor = tokens_collections.find({
+    tokens_cursor = tokens_collection.find({
       "token": token
     })
 
@@ -182,14 +195,5 @@ def generate_token():
 
 
 if __name__ == '__main__':
-  #connect to database
-  db = connect()
-
-  #collections
-  tokens_collections = db.tokens
-
-  #statistics
-  statistics_collections = db.statistics
-
   system('title ServerLogs')
   app.run(host='0.0.0.0', debug=True)
