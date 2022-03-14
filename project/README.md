@@ -29,3 +29,7 @@ python server.py
 | POST | /generate |
 | POST | /get-from-token |
 | POST | /search |
+
+## Example
+
+http://www.shrtner.cf/r/JDXCZzPE
