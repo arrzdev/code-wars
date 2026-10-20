@@ -1,4 +1,7 @@
 # Code Wars
+
+🥉 **3rd place, project challenge — Code Wars 2022** (Systems Group / EY, March 2022) · solo vs ~12 teams · €100 prize
+
 > This is the repository of all the code written by me during the competition Code Wars. Code Wars is a team coding competition each team with ~3/4 members were I participated alone.
 
 ## Leet Code
